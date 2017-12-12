@@ -1,0 +1,376 @@
+{% extends "mainsite/header.html" %}
+
+{% block content %}
+
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand" href=".">Sensemaking</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+                <a class="nav-link" href="">
+                    <i class="fa fa-fw fa-dashboard"></i>
+                    <span class="nav-link-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+                <a class="nav-link" href="../virality-prediction">
+                    <i class="fa fa-fw fa-area-chart"></i>
+                    <span class="nav-link-text">Virality Prediction</span>
+                </a>
+            </li>
+            <!--<li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">-->
+                <!--<a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseComponents"-->
+                   <!--data-parent="#exampleAccordion">-->
+                    <!--<i class="fa fa-fw fa-wrench"></i>-->
+                    <!--<span class="nav-link-text">System Setting</span>-->
+                <!--</a>-->
+                <!--<ul class="sidenav-second-level collapse" id="collapseComponents">-->
+                    <!--<li>-->
+                        <!--<a href="navbar.html">Navbar</a>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<a href="cards.html">Cards</a>-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</li>-->
+
+        </ul>
+        <ul class="navbar-nav sidenav-toggler">
+            <li class="nav-item">
+                <a class="nav-link text-center" id="sidenavToggler">
+                    <i class="fa fa-fw fa-angle-left"></i>
+                </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <form class="form-inline my-2 my-lg-0 mr-lg-2" method="post" action=".">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input class="form-control" type="text" placeholder="Search for hashtags"
+                               name="search_text" id="search_text">
+                        <input class="form-control" type="hidden"
+                               name="hidden_search_text" id="hidden_search_text">
+                        <input class="form-control" type="hidden"
+                               name="hidden_hashtag_names" id="hidden_hashtag_names">
+                        <input class="form-control" type="hidden"
+                               name="hidden_user_names" id="hidden_user_names">
+                        <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button" id="search_btn">
+                          <i class="fa fa-search"></i>
+                        </button>
+                      </span>
+
+                    </div>
+
+                </form>
+            </li>
+            <li class="nav-item">
+                <button type="button" class="btn btn-primary" data-toggle="modal" id="show_advanced_search_btn"
+                        data-target="#advanded_search_modal">Advanced Search
+                </button>
+            </li>
+            <!--<li class="nav-item">-->
+                <!--<a class="nav-link" data-toggle="modal" data-target="#exampleModal">-->
+                    <!--<i class="fa fa-fw fa-sign-out"></i>Logout</a>-->
+            <!--</li>-->
+        </ul>
+    </div>
+</nav>
+<div class="modal fade" id="message-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modal-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="advanded_search_modal" tabindex="-1"
+     role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Advanced Search</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form">
+
+                    <div class="form-row">
+
+                        <div class="form-group col-md-5">
+                            <label>From</label>
+                            <input type="text" class="form-control" id="from-year"
+                                   placeholder="2016" value="2016" readonly>
+
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label style="color:white">.</label>
+                            <select id="from-month" class="form-control">
+                                <option value="0" selected>Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label style="color:white">.</label>
+                            <select id="from-day" class="form-control" disabled="true">
+                                <option selected>Day</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-5">
+                            <label>To</label>
+                            <input type="text" class="form-control" id="to-year"
+                                   placeholder="2016" value="2016" readonly="true">
+
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label style="color:white">.</label>
+                            <select id="to-month" class="form-control">
+                                <option value="0" selected>Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label style="color:white">.</label>
+                            <select id="to-day" class="form-control" disabled="true">
+                                <option selected>Day</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <select id="search-category" class="form-control">
+                                <option value="category" selected>Category</option>
+                                <option value="hashtag">Hashtag</option>
+                                <option value="user">User</option>
+                                <option value="keyword">Keyword</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-8">
+                            <input type="text" class="form-control"
+                                   id="advanced-search-text"
+                                   placeholder="Search for ...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-12">
+                            <select id="plot-type" class="form-control" disabled>
+                                <option value="-1" selected>Select type of plot</option>
+
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="advanced-search-button" value="search">Search</button>
+            </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="content-wrapper">
+    <div class="container-fluid" id="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb bg-light" id="bread-crumb">
+            <li class="breadcrumb-item">
+                <a href="./">Sensemaking</a>
+            </li>
+            <li class="breadcrumb-item active" id="dashboard-sub-breadcrumb">Dashboard</li>
+            <!--<li class="breadcrumb-item active"></li>-->
+        </ol>
+        <!-- Basic stats -->
+        <div class="row" id="basic-stats">
+            <div class="col-xl-4 col-sm-6 mb-4">
+                <div class="card text-white bg-primary o-hidden h-100">
+                    <div class="card-body">
+                        <div class="card-body-icon">
+                            <i class="fa fa-fw fa-twitter"></i>
+                        </div>
+                        <div class="mr-5" id="tweet_count_lbl"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-sm-6 mb-4">
+                <div class="card text-white bg-danger o-hidden h-100">
+                    <div class="card-body">
+                        <div class="card-body-icon">
+                            <i class="fa fa-fw fa-users"></i>
+                        </div>
+                        <div class="mr-5" id="user-count"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-sm-6 mb-4">
+                <div class="card text-white bg-success o-hidden h-100">
+                    <div class="card-body">
+                        <div class="card-body-icon">
+                            <i class="fa fa-fw fa-hashtag"></i>
+                        </div>
+                        <div class="mr-5" id="tweet-coverage"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of basic stats -->
+
+
+        <div class="row">
+            <!-- Plots -->
+            <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
+
+                <div class="card">
+                    <div class="card-header" id="main-plot-title">
+                    </div>
+                    <div class="card-body">
+                        <div id="distribution_plot" style="width:100%;height:auto"></div>
+                    </div>
+                </div>
+                <br>
+                <div class="card" id="user-distribution-plot-card">
+                    <div class="card-header" id="user-plot-title"></div>
+                    <div class="card-body">
+                        <div id="user_distribution_plot" style="width:100%;height:auto"></div>
+                    </div>
+                </div>
+                <br>
+            </div>
+            <!-- End of plots -->
+
+            <!-- Texts -->
+            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                <div role="tablist" id="accordion">
+
+
+                    <div class="card" id="tweets-related-to-hashtags-card">
+                        <div class="card-header" role="tab" id="headingOne">
+                            <h5 class="mb-0">
+                                <a data-toggle="collapse" href="#collapseOne" aria-expanded="true"
+                                   aria-controls="collapseOne">
+                                    <span class="hashtag-toggle-text">Tweets related to the hashtags</span>
+                                </a>
+                            </h5>
+                        </div>
+
+                        <div id="collapseOne" class="collapse" role="tabpanel" aria-labelledby="headingOne"
+                             data-parent="#accordion">
+                            <div class="card-body">
+                                <div id="tweet-text-area">
+                                    <table id="hashtag-tweet-table" class="table table-striped table-bordered" cellspacing="0"
+                                           width="100%">
+
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header" role="tab" id="headingTwo">
+                            <h5 class="mb-0">
+                                <a class="collapsed" data-toggle="collapse" href="#collapseTwo"
+                                   aria-expanded="false" aria-controls="collapseTwo">
+                                    <span class="user-toggle-text">Tweets related to the users</span>
+                                </a>
+                            </h5>
+                        </div>
+
+                        <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo"
+                             data-parent="#accordion">
+                            <div class="card-body">
+                                <div id="user-tweet-text-area">
+                                    <table id="user-tweet-table" class="table table-striped table-bordered" cellspacing="0"
+                                           width="100%">
+
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="user-tweet-text"></div>
+
+            </div>
+            <!-- End of texts -->
+        </div>
+
+
+        <!-- Footer -->
+        <footer class="sticky-footer">
+            <div class="container">
+                <div class="text-center">
+                    <small>Copyright © Sensemaking 2017</small>
+                </div>
+            </div>
+        </footer>
+        <!-- Scroll to Top Button-->
+        <a class="scroll-to-top rounded" href="#page-top">
+            <i class="fa fa-angle-up"></i>
+        </a>
+        <!-- Logout Modal-->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="login.html">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends "mainsite/header.html" %}
+
+{% block content %}
+
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand" href="../">Sensemaking</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse"
+            data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false"
+            aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+                <a class="nav-link" href="../">
+                    <i class="fa fa-fw fa-dashboard"></i>
+                    <span class="nav-link-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Charts">
+                <a class="nav-link" href="../virality-prediction">
+                    <i class="fa fa-fw fa-area-chart"></i>
+                    <span class="nav-link-text">Virality Prediction</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav sidenav-toggler">
+            <li class="nav-item">
+                <a class="nav-link text-center" id="sidenavToggler">
+                    <i class="fa fa-fw fa-angle-left"></i>
+                </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
+                    <i class="fa fa-fw fa-sign-out"></i>Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<div class="content-wrapper">
+    <div class="container-fluid">
+        <!-- Breadcrumbs-->
+        <ol class="breadcrumb bg-light">
+            <li class="breadcrumb-item">
+                <a href="../">Sensemaking</a>
+            </li>
+            <li class="breadcrumb-item active">Virality Prediction</li>
+        </ol>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="form-area">
+                    <form role="form" action="." method="POST" id="virality_form">
+                        {% csrf_token %}
+                        <br style="clear:both">
+                        <div class="form-row">
+                            <div class="form-group col-md-2">Pick a start date</div>
+                            <div class="form-group col-md-4">
+                                <select id="start-month" class="form-control">
+                                    <option value="-1" selected>Month</option>
+                                    <option value="1">January</option>
+                                    <option value="2">February</option>
+                                    <option value="3">March</option>
+                                    <option value="4">April</option>
+                                    <option value="5">May</option>
+                                    <option value="6">June</option>
+                                    <option value="7">July</option>
+                                    <option value="8">August</option>
+                                    <option value="9">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <select id="start-day" class="form-control" disabled>
+                                    <option value="-1" selected>Day</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <select id="observation_time" name="observation_time" class="form-control">
+                                    <option selected value="0">Observation Time</option>
+                                    <option value="6">6 hours</option>
+                                    <option value="12">12 hours</option>
+                                    <option value="24">24 hours</option>
+                                    <option value="48">48 hours</option>
+                                    <option value="72">72 hours</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <select id="prediction_time" name="prediction_time" class="form-control" disabled>
+                                    <option selected value="0">Prediction Time</option>
+                                    <option value="6">6 hours</option>
+                                    <option value="12">12 hours</option>
+                                    <option value="24">24 hours</option>
+                                    <option value="48">48 hours</option>
+                                    <option value="72">72 hours</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <select id="select_hashtag" name="select_hashtag"
+                                        class="form-control" disabled>
+                                    <option selected value="0">Select Hashtag</option>
+                                    {% for ht in hashtags %}
+                                    <option value="{{ ht }}">{{ ht }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <select id="select_virality_threshold" name="select_virality_threshold"
+                                        class="form-control" disabled>
+                                    <option selected value="0">Virality Threshold</option>
+                                    <option value="85">85 %</option>
+                                    <option value="90">90 %</option>
+                                    <option value="95">95 %</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <button type="button" id="predict_button" name="predict_button"
+                                        class="btn btn-primary pull-right">Predict
+                                </button>
+                            </div>
+                        </div>
+                        <br style="clear:both">
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="predcition_area" class="row {{ prd_div }}">
+            <div class="col-sm-6">
+                <div class="card text-center card-inverse">
+                    <div class="card-header">
+                        <h3>Observation</h3></div>
+                    <div class="card-block">
+                        <ul class="list-group">
+                            <li class="list-group-item" >
+                                <div id="virality-threshold-desc"></div>
+                            </li>
+                            <!--<li class="list-group-item">Current size of {{ ht }} is {{ current_size }}</li>-->
+                            <li class="list-group-item"><div id='current-cascade-size'></div></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer small text-muted"></div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="card text-center card-inverse">
+                    <div class="card-header">
+                        <h3>Prediction</h3></div>
+                    <div class="card-block">
+                        <ul class="list-group">
+                            <li class="list-group-item"><div id="predicted-label"></div></li>
+                            <li class="list-group-item"><div id="confidence-indicator"></div></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer small text-muted"></div>
+                </div>
+            </div>
+        </div>
+
+        <br style="clear:both">
+        <!-- Area Chart Example-->
+
+        <!--<div class="form-check {{ prd_div }}" id="show_actual_dist">-->
+
+        <!--</div>-->
+        <div class="row" id="actual_dist_plot_area">
+            <!-- Plots -->
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div id="explanation-label" class="justify-content-center align-items-center">
+                    <h4><span class="badge badge-primary"></span></h4>
+                </div>
+            </div><br>
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+
+                <div id="actual_dist_plot" style="width:100%;height: 400px;"></div>
+                <!--<div class="card">-->
+                    <!--<div class="card-header virality-plot-title">-->
+                        <!--<i class="fa fa-area-chart"></i> Likely cause of {{ ht }} for being {{ predicted_label }}-->
+                    <!--</div>-->
+                    <!--<div class="card-body">-->
+                        <!--<div id="actual_dist_plot" style="width:100%;height: 400px;"></div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            </div><br>
+        </div>
+        <div>
+            <!--<div class="card mb-3 ">-->
+                <!--<div class="card-header">-->
+                    <!--<i class="fa fa-area-chart"></i> Number of followers of the starters in the first {{ obs_time }}-->
+                    <!--hours-->
+                <!--</div>-->
+                <!--<div id="actual_dist_plot">-->
+                <!--</div>-->
+                <!--<div class="card-footer small text-muted"></div>-->
+            <!--</div>-->
+
+            <footer class="sticky-footer">
+                <div class="container">
+                    <div class="text-center">
+                        <small>Copyright © Your Website 2017</small>
+                    </div>
+                </div>
+            </footer>
+            <!-- Scroll to Top Button-->
+            <a class="scroll-to-top rounded" href="#page-top">
+                <i class="fa fa-angle-up"></i>
+            </a>
+            <!-- Logout Modal-->
+            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">Select "Logout" below if you are ready to end your current
+                            session.
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                            <a class="btn btn-primary" href="login.html">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

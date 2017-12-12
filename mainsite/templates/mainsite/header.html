@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Sensemaking</title>
+    {% load staticfiles %}
+    <!-- Bootstrap core CSS-->
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- Page level plugin CSS-->
+    <link href="{% static 'vendor/datatables/dataTables.bootstrap4.css' %}" rel="stylesheet">
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+
+    <link href="{% static 'css/sensemaking.css' %}" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+</head>
+
+
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+<div>
+    {% block content %}
+
+    {% endblock %}
+</div>
+<!-- Bootstrap core JavaScript-->
+<script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<!-- Core plugin JavaScript-->
+<script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+<!-- Page level plugin JavaScript-->
+<!-- <script src="{% static 'vendor/chart.js/Chart.min.js' %}"></script> -->
+<script src="{% static 'vendor/datatables/jquery.dataTables.js' %}"></script>
+<script src="{% static 'vendor/datatables/dataTables.bootstrap4.js' %}"></script>
+<!-- Custom scripts for all pages-->
+<script src="{% static 'js/sb-admin.min.js' %}"></script>
+<!-- Custom scripts for this page-->
+<script src="{% static 'js/sb-admin-datatables.min.js' %}"></script>
+<!-- <script src="{% static 'js/sb-admin-charts.min.js' %}"></script> -->
+
+<!-- Custom scripts for all pages-->
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script>
+
+    {% block scripts %}
+
+
+    $("#basic-stats").hide();
+
+    function daysInMonth(month, year) {
+        return new Date(year, month, 0).getDate();
+    }
+
+    function format_month_day(m) {
+        if (m < 10) return '0' + m;
+        return m;
+    }
+
+    function populate_option(val, to) {
+        $('#' + to).children('option:not(:first)').remove();
+        for (var i = 1; i <= daysInMonth(val, 2016); i++) {
+            $('#' + to).append($('<option>').text(i).attr('value', i));
+        }
+        $('#' + to).prop('disabled', false)
+    }
+
+    function populateOption(val, to, enableComponents, disableComponents) {
+        $('#' + to).children('option:not(:first)').remove();
+        for (var i = 1; i <= daysInMonth(val, 2016); i++) {
+            $('#' + to).append($('<option>').text(i).attr('value', i));
+        }
+        for (var i in enableComponents) $('#' + enableComponents[i]).prop('disabled', false)
+        for (var i in disableComponents) $('#' + disableComponents[i]).prop('disabled', true)
+    }
+
+    function populate_plot_type(category) {
+        $('#plot-type').children('option:not(:first)').remove();
+        var values;
+        if (category == 'hashtag') {
+            values = [
+                "User distribution over time",
+                "Tweet distribution over time"
+            ];
+        } else if (category == 'user') {
+            values = [
+                "Retweet distribution over time",
+                "Hashtag distribution over time",
+                "Retweet and Hashtag distribution over time"
+            ];
+        } else {
+            $('#plot-type').hide()
+            return
+        }
+        $('#plot-type').show()
+        for (var i in values) {
+            $('#plot-type').append($('<option>').text(values[i]).attr('value', i))
+        }
+        $('#plot-type').prop('disabled', false);
+    }
+    function hideDiv(divId) {
+        $("#" + divId).hide();
+    }
+    function setAccordionTitle(accordionId, title) {
+        $("." + accordionId).text(title);
+    }
+    function addBreadCrumb(title) {
+        $("#container-fluid ol").append('<li class="breadcrumb-item active">' + title + '</li>');
+    }
+
+    function transfer_search_text() {
+
+        if ($('#search_text').prop('value') != '') {
+            $('#advanced-search-text').prop('value', $('#search_text').prop('value'));
+
+            $('#from-month').prop('value', "1");
+            populate_option($('#from-month').prop('value'), 'from-day');
+            $('#from-day').prop('disabled', false)
+            $('#from-day').prop('value', "1");
+
+            $('#to-month').prop('value', "12");
+            populate_option($('#to-month').prop('value'), 'to-day');
+            $('#to-day').prop('disabled', false)
+            $('#to-day').prop('value', "31");
+
+            $('#search-category').prop('value', "hashtag");
+            populate_plot_type("hashtag")
+        }
+    }
+
+    var data = {{ data | safe }}
+    // var stats = {{ stats | safe }}
+    {% endblock %}
+</script>
+<script src="{% static 'js/plots.js' %}"></script>
+<script src="{% static 'js/sensemaking.js' %}"></script>
+
+
+</body>
+</html>
